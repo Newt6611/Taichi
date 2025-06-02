@@ -22,11 +22,11 @@ type Taichi struct {
 
 func NewTaichi(provider provider.Provider) *Taichi {
 	return &Taichi{
-		provider: provider,
-		addressAttachEvents: make(map[string]UTxOHandler),
-		addressDetachEvents: make(map[string]UTxOHandler),
-		paymentAttachEvents: make(map[string]UTxOHandler),
-		paymentDetachEvents: make(map[string]UTxOHandler),
+		provider:             provider,
+		addressAttachEvents:  make(map[string]UTxOHandler),
+		addressDetachEvents:  make(map[string]UTxOHandler),
+		paymentAttachEvents:  make(map[string]UTxOHandler),
+		paymentDetachEvents:  make(map[string]UTxOHandler),
 		stakeKeyAttachEvents: make(map[string]UTxOHandler),
 		stakeKeyDetachEvents: make(map[string]UTxOHandler),
 	}
