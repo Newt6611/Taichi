@@ -15,6 +15,9 @@ type Taichi struct {
 
 	paymentAttachEvents map[string]UTxOHandler
 	paymentDetachEvents map[string]UTxOHandler
+
+	stakeKeyAttachEvents map[string]UTxOHandler
+	stakeKeyDetachEvents map[string]UTxOHandler
 }
 
 func NewTaichi(provider provider.Provider) *Taichi {
@@ -24,6 +27,8 @@ func NewTaichi(provider provider.Provider) *Taichi {
 		addressDetachEvents: make(map[string]UTxOHandler),
 		paymentAttachEvents: make(map[string]UTxOHandler),
 		paymentDetachEvents: make(map[string]UTxOHandler),
+		stakeKeyAttachEvents: make(map[string]UTxOHandler),
+		stakeKeyDetachEvents: make(map[string]UTxOHandler),
 	}
 }
 
@@ -41,6 +46,11 @@ func (t *Taichi) Run(slotNum int64, blockHash string) {
 				if t.paymentDetachEvents[paymentStr] != nil {
 					t.paymentDetachEvents[paymentStr](input)
 				}
+
+				stakeKeyStr := input.Address.StakeKeyHash().String()
+				if t.stakeKeyDetachEvents[stakeKeyStr] != nil {
+					t.stakeKeyDetachEvents[stakeKeyStr](input)
+				}
 			}
 
 			for _, output := range tx.Inputs {
@@ -52,6 +62,11 @@ func (t *Taichi) Run(slotNum int64, blockHash string) {
 				paymentStr := output.Address.PaymentKeyHash().String()
 				if t.paymentAttachEvents[paymentStr] != nil {
 					t.paymentAttachEvents[paymentStr](output)
+				}
+
+				stakeKeyStr := output.Address.StakeKeyHash().String()
+				if t.stakeKeyAttachEvents[stakeKeyStr] != nil {
+					t.stakeKeyAttachEvents[stakeKeyStr](output)
 				}
 			}
 		}
@@ -79,5 +94,17 @@ func (t *Taichi) OnPaymentKeyHashAttach(paymentKeyHash string, handler UTxOHandl
 func (t *Taichi) OnPaymentKeyHashDetach(paymentKeyHash string, handler UTxOHandler) {
 	if _, ok := t.paymentDetachEvents[paymentKeyHash]; !ok {
 		t.paymentDetachEvents[paymentKeyHash] = handler
+	}
+}
+
+func (t *Taichi) OnStakeKeyHashAttach(stakeKeyHash string, handler UTxOHandler) {
+	if _, ok := t.stakeKeyAttachEvents[stakeKeyHash]; !ok {
+		t.stakeKeyAttachEvents[stakeKeyHash] = handler
+	}
+}
+
+func (t *Taichi) OnStakeKeyHashDetach(stakeKeyHash string, handler UTxOHandler) {
+	if _, ok := t.stakeKeyDetachEvents[stakeKeyHash]; !ok {
+		t.stakeKeyDetachEvents[stakeKeyHash] = handler
 	}
 }
