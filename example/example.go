@@ -37,11 +37,11 @@ func main() {
 
 	stakingKey := "e34fec0560cbb68fbf0e8758d52ec25c56574bfe0a7e332974714f1d"
 
-	tai.OnStakeKeyHashDetach(stakingKey, func(utxo types.UTxO) {
+	tai.OnStakingKeyHashDetach(stakingKey, func(utxo types.UTxO) {
 		// When an staking credential utxo is spent
 	})
 
-	tai.OnStakeKeyHashAttach(stakingKey, func(utxo types.UTxO) {
+	tai.OnStakingKeyHashAttach(stakingKey, func(utxo types.UTxO) {
 		// When an staking credential receives a new utxo
 	})
 

@@ -16,8 +16,8 @@ type Taichi struct {
 	paymentAttachEvents map[string]UTxOHandler
 	paymentDetachEvents map[string]UTxOHandler
 
-	stakeKeyAttachEvents map[string]UTxOHandler
-	stakeKeyDetachEvents map[string]UTxOHandler
+	stakingKeyAttachEvents map[string]UTxOHandler
+	stakingKeyDetachEvents map[string]UTxOHandler
 }
 
 func NewTaichi(provider provider.Provider) *Taichi {
@@ -27,8 +27,8 @@ func NewTaichi(provider provider.Provider) *Taichi {
 		addressDetachEvents:  make(map[string]UTxOHandler),
 		paymentAttachEvents:  make(map[string]UTxOHandler),
 		paymentDetachEvents:  make(map[string]UTxOHandler),
-		stakeKeyAttachEvents: make(map[string]UTxOHandler),
-		stakeKeyDetachEvents: make(map[string]UTxOHandler),
+		stakingKeyAttachEvents: make(map[string]UTxOHandler),
+		stakingKeyDetachEvents: make(map[string]UTxOHandler),
 	}
 }
 
@@ -48,8 +48,8 @@ func (t *Taichi) Run(slotNum int64, blockHash string) {
 				}
 
 				stakeKeyStr := input.Address.StakeKeyHash().String()
-				if t.stakeKeyDetachEvents[stakeKeyStr] != nil {
-					t.stakeKeyDetachEvents[stakeKeyStr](input)
+				if t.stakingKeyDetachEvents[stakeKeyStr] != nil {
+					t.stakingKeyDetachEvents[stakeKeyStr](input)
 				}
 			}
 
@@ -65,8 +65,8 @@ func (t *Taichi) Run(slotNum int64, blockHash string) {
 				}
 
 				stakeKeyStr := output.Address.StakeKeyHash().String()
-				if t.stakeKeyAttachEvents[stakeKeyStr] != nil {
-					t.stakeKeyAttachEvents[stakeKeyStr](output)
+				if t.stakingKeyAttachEvents[stakeKeyStr] != nil {
+					t.stakingKeyAttachEvents[stakeKeyStr](output)
 				}
 			}
 		}
@@ -97,14 +97,14 @@ func (t *Taichi) OnPaymentKeyHashDetach(paymentKeyHash string, handler UTxOHandl
 	}
 }
 
-func (t *Taichi) OnStakeKeyHashAttach(stakeKeyHash string, handler UTxOHandler) {
-	if _, ok := t.stakeKeyAttachEvents[stakeKeyHash]; !ok {
-		t.stakeKeyAttachEvents[stakeKeyHash] = handler
+func (t *Taichi) OnStakingKeyHashAttach(stakeKeyHash string, handler UTxOHandler) {
+	if _, ok := t.stakingKeyAttachEvents[stakeKeyHash]; !ok {
+		t.stakingKeyAttachEvents[stakeKeyHash] = handler
 	}
 }
 
-func (t *Taichi) OnStakeKeyHashDetach(stakeKeyHash string, handler UTxOHandler) {
-	if _, ok := t.stakeKeyDetachEvents[stakeKeyHash]; !ok {
-		t.stakeKeyDetachEvents[stakeKeyHash] = handler
+func (t *Taichi) OnStakingKeyHashDetach(stakeKeyHash string, handler UTxOHandler) {
+	if _, ok := t.stakingKeyDetachEvents[stakeKeyHash]; !ok {
+		t.stakingKeyDetachEvents[stakeKeyHash] = handler
 	}
 }
