@@ -1,18 +1,6 @@
-# Taichi
-
-> Currently for my personal use only.
-
-
-<div align="center">
-    <img src="./assets/logo.png" alt="taichi logo" width="480">
-</div>
-
-```go
-package main
+package example
 
 import (
-	"fmt"
-
 	"github.com/newt6611/taichi"
 	"github.com/newt6611/taichi/provider/u5c"
 	"github.com/newt6611/taichi/types"
@@ -37,6 +25,25 @@ func main() {
 		// When an address receives a new utxo
 	})
 
+	paymentKey := "036cea874e068fd88c786c92628241f267decc992116e0e2cea7299a"
+
+	tai.OnPaymentKeyHashDetach(paymentKey, func(utxo types.UTxO) {
+		// When an payment credential utxo is spent
+	})
+
+	tai.OnPaymentKeyHashAttach(paymentKey, func(utxo types.UTxO) {
+		// When an payment credential receives a new utxo
+	})
+
+	stakingKey := "e34fec0560cbb68fbf0e8758d52ec25c56574bfe0a7e332974714f1d"
+
+	tai.OnStakeKeyHashDetach(stakingKey, func(utxo types.UTxO) {
+		// When an staking credential utxo is spent
+	})
+
+	tai.OnStakeKeyHashAttach(stakingKey, func(utxo types.UTxO) {
+		// When an staking credential receives a new utxo
+	})
+
 	tai.Run(93011205, "32af702bc8604616dd2f243a57d6c9a543b2bdba1abdf9eb8b93d0529167585b")
 }
-```
