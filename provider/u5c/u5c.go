@@ -3,6 +3,7 @@ package u5c
 import (
 	"fmt"
 
+	"github.com/blinklabs-io/gouroboros/cbor"
 	"github.com/blinklabs-io/gouroboros/ledger/common"
 	"github.com/newt6611/taichi/types"
 	"github.com/utxorpc/go-codegen/utxorpc/v1alpha/cardano"
@@ -91,11 +92,8 @@ func parseBlock(block *cardano.Block) types.Block {
 				DatumHash: out.Datum.Hash,
 				Datum:     out.Datum.OriginalCbor,
 				Address:   address,
-				Assets:    make([]types.MultiAsset, len(out.Assets)),
+				Assets:    parseMultiAssets(out.Assets),
 			}
-
-			// Extract assets
-			utxo.Assets = parseMultiAssets(out.Assets)
 
 			// Assign back to result block
 			resultBlock.Body.Txs[txIdx].Inputs[inputIdx] = utxo
@@ -117,7 +115,7 @@ func parseBlock(block *cardano.Block) types.Block {
 				DatumHash: txOut.Datum.Hash,
 				Datum:     txOut.Datum.OriginalCbor,
 				Address:   address,
-				Assets:    make([]types.MultiAsset, len(txOut.Assets)),
+				Assets:    parseMultiAssets(txOut.Assets),
 			}
 
 			// Extract assets
@@ -132,21 +130,18 @@ func parseBlock(block *cardano.Block) types.Block {
 	return resultBlock
 }
 
-func parseMultiAssets(rawAssets []*cardano.Multiasset) []types.MultiAsset {
-	multiAssets := make([]types.MultiAsset, len(rawAssets))
+func parseMultiAssets(rawAssets []*cardano.Multiasset) common.MultiAsset[common.MultiAssetTypeOutput] {
+	multiAssets := common.NewMultiAsset[common.MultiAssetTypeOutput](nil)
 
-	for i, ma := range rawAssets {
-		assets := make([]types.Asset, len(ma.Assets))
-		for j, asset := range ma.Assets {
-			assets[j] = types.Asset{
-				Name:     asset.Name,
-				Quantity: int64(asset.OutputCoin),
-			}
+	for _, ma := range rawAssets {
+		policyId := common.NewBlake2b224(ma.PolicyId)
+		assets := map[common.Blake2b224]map[cbor.ByteString]common.MultiAssetTypeOutput{}
+
+		for _, asset := range ma.Assets {
+			assets[policyId][cbor.NewByteString(asset.Name)] = asset.OutputCoin
 		}
-		multiAssets[i] = types.MultiAsset{
-			PolicyId: ma.PolicyId,
-			Assets:   assets,
-		}
+		mAssets := common.NewMultiAsset[common.MultiAssetTypeOutput](assets)
+		multiAssets.Add(&mAssets)
 	}
 
 	return multiAssets

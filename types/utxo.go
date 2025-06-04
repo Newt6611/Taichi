@@ -7,7 +7,7 @@ type UTxO struct {
 	TxHash    common.Blake2b256
 	Index     uint64
 	Address   common.Address
-	Assets    []MultiAsset
+	Assets    common.MultiAsset[common.MultiAssetTypeOutput]
 	DatumHash []byte
 	Datum     []byte
 	Script    []byte
